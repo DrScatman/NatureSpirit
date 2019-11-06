@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="NatureSpirit:jar">
+    <output-path>$USER_HOME$/Documents/RSPeer/scripts</output-path>
+    <root id="archive" name="NatureSpirit.jar">
+      <element id="module-output" name="NatureSpirit" />
+    </root>
+  </artifact>
+</component>
