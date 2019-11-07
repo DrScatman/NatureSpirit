@@ -19,7 +19,7 @@ public class Main extends TaskScript {
             GameCanvas.setInputEnabled(true);
         }
 
-        submit( new BuySupplies(),
+        submit(new BuySupplies(),
                 new NatureSpirit0(),
                 new NatureSpirit1(),
                 new NatureSpirit2(),
@@ -27,7 +27,8 @@ public class Main extends TaskScript {
                 new NatureSpirit4(),
                 new NatureSpirit5(),
                 new NatureSpirit6(),
-                new NatureSpirit7()
+                new NatureSpirit7(),
+                new NatureSpirit8()
         );
     }
 
@@ -37,6 +38,6 @@ public class Main extends TaskScript {
     }
 
     public static int getLoopReturn() {
-        return Random.low(600, 1200);
+        return Random.low(600, 1600);
     }
 }

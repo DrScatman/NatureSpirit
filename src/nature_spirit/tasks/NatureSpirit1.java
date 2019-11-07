@@ -9,7 +9,6 @@ import org.rspeer.runetek.api.commons.Time;
 import org.rspeer.runetek.api.component.Dialog;
 import org.rspeer.runetek.api.component.tab.Equipment;
 import org.rspeer.runetek.api.component.tab.Inventory;
-import org.rspeer.runetek.api.movement.Movement;
 import org.rspeer.runetek.api.scene.Players;
 import org.rspeer.runetek.api.scene.SceneObjects;
 import org.rspeer.script.task.Task;
@@ -32,19 +31,7 @@ public class NatureSpirit1 extends Task {
         }
 
         if (!Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {
-
-            if (Location.NATURE_GROTTO_BRIDGE_POSITION.distance() > 3) {
-                Movement.walkTo(Location.NATURE_GROTTO_BRIDGE_POSITION, WalkingWrapper::shouldBreakWalkLoop);
-
-                if (Location.NATURE_GROTTO_BRIDGE_POSITION.distance() > 3 && !Movement.isRunEnabled()) {
-                    Movement.toggleRun(true);
-                }
-            } else {
-                SceneObject bridge = SceneObjects.getNearest("Bridge");
-                if (bridge != null && bridge.interact(a -> true)) {
-                    Time.sleepUntil(() -> Location.NATURE_GROTTO_AREA.contains(Players.getLocal()), 5000);
-                }
-            }
+            WalkingWrapper.walkToNatureGrotto();
         }
 
         if (Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {

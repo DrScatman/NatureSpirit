@@ -29,7 +29,7 @@ public class BuySupplies extends Task {
             "Staff of air",
             "Staff of fire",
             "Amulet of glory(6)",
-            "Ring of wealth (5)",
+            "Ring of wealth(5)",
             "Air rune",
             "Mind rune",
             "Water rune",
@@ -39,7 +39,7 @@ public class BuySupplies extends Task {
             "Cheese",
             "Leather gloves",
             "Falador teleport",
-            "Games necklace (8)",
+            "Games necklace(8)",
             "Rope",
             "Adamant scimitar",
             "Ring of recoil",
@@ -58,18 +58,15 @@ public class BuySupplies extends Task {
 
     @Override
     public boolean validate() {
-        if (!GEWrapper.isBuySupplies())
-            return false;
-
         if (itemsIterator != null || GEWrapper.itemsStillActive(RSGrandExchangeOffer.Type.BUY))
             return true;
 
         if (Quest.NATURE_SPIRIT.getVarpValue() <= 5 
-                && !GEWrapper.hasSupplies(ALL_ITEMS_NEEDED_FOR_ACCOUNT_PREPERATION) && itemsIterator == null) {
+                && !GEWrapper.hasSupplies(NATURE_SPIRIT_SUPPLIES) && itemsIterator == null) {
 
             Log.fine("Buying Supplies");
             items = new HashSet<>();
-            items.addAll(Arrays.asList(ALL_ITEMS_NEEDED_FOR_ACCOUNT_PREPERATION));
+            items.addAll(Arrays.asList(NATURE_SPIRIT_SUPPLIES));
 
             itemsIterator = items.iterator();
             itemToBuy = itemsIterator.next();
