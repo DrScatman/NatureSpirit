@@ -5,6 +5,7 @@ import nature_spirit.data.Location;
 import nature_spirit.data.Quest;
 import org.rspeer.runetek.adapter.scene.SceneObject;
 import org.rspeer.runetek.api.commons.Time;
+import org.rspeer.runetek.api.component.Dialog;
 import org.rspeer.runetek.api.component.tab.Equipment;
 import org.rspeer.runetek.api.component.tab.Inventory;
 import org.rspeer.runetek.api.movement.Movement;
@@ -40,7 +41,7 @@ public class NatureSpirit1 extends Task {
             } else {
                 SceneObject bridge = SceneObjects.getNearest("Bridge");
                 if (bridge != null && bridge.interact(a -> true)) {
-                    Time.sleepUntil(() -> Players.getLocal().isMoving() || Players.getLocal().isAnimating(), 5000);
+                    Time.sleepUntil(() -> Location.NATURE_GROTTO_AREA.contains(Players.getLocal()), 5000);
                 }
             }
         }
@@ -52,16 +53,17 @@ public class NatureSpirit1 extends Task {
                 Time.sleepUntil(() -> Equipment.contains("Ghostspeak amulet"), 5000);
             }
 
-            SceneObject grotto = SceneObjects.getNearest("Grotto tree");
+            SceneObject grotto = SceneObjects.getNearest("Grotto");
+            SceneObject bridge = SceneObjects.getNearest("Bridge");
 
-            if (grotto != null && grotto.interact("Search")) {
-                Time.sleep(2000, 2500);
-            }
-
-            SceneObject bowl = SceneObjects.getNearest("Washing bowl");
-
-            if (bowl != null && bowl.interact("Take")) {
-                Time.sleep(2000, 2500);
+            if (grotto != null && grotto.interact(a -> true)) {
+                if (Time.sleepUntil(() -> Quest.NATURE_SPIRIT.getVarpValue() == 10, 5000)) {
+                    Time.sleepUntil(Dialog::isOpen, 1000, 5000);
+                } else {
+                    if (bridge != null && bridge.interact(a -> true)) {
+                        Time.sleepUntil(() -> !Location.NATURE_GROTTO_AREA.contains(Players.getLocal()), 5000);
+                    }
+                }
             }
         }
 

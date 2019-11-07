@@ -1,8 +1,6 @@
 package nature_spirit;
 
-import nature_spirit.tasks.BuySupplies;
-import nature_spirit.tasks.NatureSpirit0;
-import nature_spirit.tasks.NatureSpirit1;
+import nature_spirit.tasks.*;
 import org.rspeer.runetek.adapter.scene.Npc;
 import org.rspeer.runetek.api.commons.math.Random;
 import org.rspeer.runetek.api.movement.Movement;
@@ -27,7 +25,12 @@ public class Main extends TaskScript {
 
         submit( new BuySupplies(),
                 new NatureSpirit0(),
-                new NatureSpirit1());
+                new NatureSpirit1(),
+                new NatureSpirit2(),
+                new NatureSpirit3(),
+                new NatureSpirit4(),
+                new NatureSpirit5()
+        );
     }
 
     @Override
@@ -37,7 +40,7 @@ public class Main extends TaskScript {
 
     public static boolean shouldBreakWalkLoop() {
         Npc attacker = Npcs.getNearest(a -> true);
-        return Movement.getRunEnergy() > 0 && attacker != null
+        return Movement.getRunEnergy() > 0 &&!Movement.isRunEnabled() && attacker != null
                 && attacker.getTarget() != null
                 && attacker.getTarget().equals(Players.getLocal());
     }
