@@ -3,6 +3,7 @@ package nature_spirit.tasks;
 import nature_spirit.Main;
 import nature_spirit.data.Location;
 import nature_spirit.data.Quest;
+import nature_spirit.wrappers.WalkingWrapper;
 import org.rspeer.runetek.adapter.scene.SceneObject;
 import org.rspeer.runetek.api.commons.Time;
 import org.rspeer.runetek.api.component.Dialog;
@@ -33,7 +34,7 @@ public class NatureSpirit1 extends Task {
         if (!Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {
 
             if (Location.NATURE_GROTTO_BRIDGE_POSITION.distance() > 3) {
-                Movement.walkTo(Location.NATURE_GROTTO_BRIDGE_POSITION, Main::shouldBreakWalkLoop);
+                Movement.walkTo(Location.NATURE_GROTTO_BRIDGE_POSITION, WalkingWrapper::shouldBreakWalkLoop);
 
                 if (Location.NATURE_GROTTO_BRIDGE_POSITION.distance() > 3 && !Movement.isRunEnabled()) {
                     Movement.toggleRun(true);

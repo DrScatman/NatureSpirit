@@ -3,6 +3,7 @@ package nature_spirit.tasks;
 import nature_spirit.Main;
 import nature_spirit.data.Location;
 import nature_spirit.data.Quest;
+import nature_spirit.wrappers.WalkingWrapper;
 import org.rspeer.runetek.adapter.scene.Npc;
 import org.rspeer.runetek.adapter.scene.SceneObject;
 import org.rspeer.runetek.api.commons.Time;
@@ -38,13 +39,19 @@ public class NatureSpirit5 extends Task {
             }
 
             if (Location.DREZEL_POSITION.distance() > 3) {
-                Movement.walkTo(Location.DREZEL_POSITION, Main::shouldBreakWalkLoop);
+                Movement.walkTo(Location.DREZEL_POSITION, WalkingWrapper::shouldBreakWalkLoop);
             }
 
             Npc drezel = Npcs.getNearest("Drezel");
-            if (drezel != null && drezel.interact("Talk-to")) {
+            if (!Dialog.isOpen() && drezel != null && drezel.interact("Talk-to")) {
                 Time.sleepUntil(Dialog::isOpen, 5000);
             }
+
+            if (Dialog.isOpen()) {
+                if (Dialog.canContinue())
+                    Dialog.processContinue();
+            }
+
         }
 
         return Main.getLoopReturn();

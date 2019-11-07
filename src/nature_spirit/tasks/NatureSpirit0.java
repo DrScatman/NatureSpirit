@@ -3,6 +3,7 @@ package nature_spirit.tasks;
 import nature_spirit.Main;
 import nature_spirit.data.Location;
 import nature_spirit.data.Quest;
+import nature_spirit.wrappers.WalkingWrapper;
 import org.rspeer.runetek.adapter.scene.Npc;
 import org.rspeer.runetek.adapter.scene.SceneObject;
 import org.rspeer.runetek.api.commons.Time;
@@ -24,7 +25,7 @@ public class NatureSpirit0 extends Task {
     @Override
     public int execute() {
         if (!Location.DUNGEON_AREA.contains(Players.getLocal()) && Location.ENTRANCE.distance() > 3) {
-            Movement.walkTo(Location.ENTRANCE, Main::shouldBreakWalkLoop);
+            Movement.walkTo(Location.ENTRANCE, WalkingWrapper::shouldBreakWalkLoop);
             if (Location.ENTRANCE.distance() > 3 && !Movement.isRunEnabled()) {
                 Movement.toggleRun(true);
             }
