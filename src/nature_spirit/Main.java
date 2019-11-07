@@ -26,7 +26,8 @@ public class Main extends TaskScript {
                 new NatureSpirit3(),
                 new NatureSpirit4(),
                 new NatureSpirit5(),
-                new NatureSpirit6()
+                new NatureSpirit6(),
+                new NatureSpirit7()
         );
     }
 
