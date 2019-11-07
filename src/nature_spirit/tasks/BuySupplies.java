@@ -3,6 +3,8 @@ package nature_spirit.tasks;
 import nature_spirit.Main;
 import nature_spirit.data.Quest;
 import nature_spirit.wrappers.GEWrapper;
+import nature_spirit.wrappers.WalkingWrapper;
+import org.rspeer.runetek.adapter.scene.SceneObject;
 import org.rspeer.runetek.api.Game;
 import org.rspeer.runetek.api.commons.BankLocation;
 import org.rspeer.runetek.api.commons.Time;
@@ -13,7 +15,9 @@ import org.rspeer.runetek.api.component.tab.Equipment;
 import org.rspeer.runetek.api.component.tab.Inventory;
 import org.rspeer.runetek.api.input.Keyboard;
 import org.rspeer.runetek.api.movement.Movement;
+import org.rspeer.runetek.api.movement.position.Position;
 import org.rspeer.runetek.api.scene.Players;
+import org.rspeer.runetek.api.scene.SceneObjects;
 import org.rspeer.runetek.providers.RSGrandExchangeOffer;
 import org.rspeer.script.task.Task;
 import org.rspeer.ui.Log;
@@ -24,44 +28,20 @@ import java.util.Iterator;
 
 public class BuySupplies extends Task {
 
-    public static final String[] ALL_ITEMS_NEEDED_FOR_ACCOUNT_PREPERATION = new String[]{
-            "Lumbridge teleport",
-            "Staff of air",
-            "Staff of fire",
-            "Amulet of glory(6)",
-            "Ring of wealth(5)",
-            "Air rune",
-            "Mind rune",
-            "Water rune",
-            "Earth rune",
-            "Tuna",
-            "Stamina potion",
-            "Cheese",
-            "Leather gloves",
-            "Falador teleport",
-            "Games necklace(8)",
-            "Rope",
-            "Adamant scimitar",
-            "Ring of recoil",
-            "Bucket",
-            "Rune essence",
-            "Varrock teleport",
-            "Silver sickle"
-    };
-
-    private static String[] NATURE_SPIRIT_SUPPLIES = new String[] {"Silver sickle", "Tuna", "Adamant scimitar", };
+    private static String[] NATURE_SPIRIT_SUPPLIES = new String[] {"Silver sickle", "Adamant scimitar"};
     private Iterator<String> itemsIterator;
     private HashSet<String> items;
     private String itemToBuy;
     private boolean checkedBank;
     private int coinsToSpend;
+    private Position lastPosition;
 
     @Override
     public boolean validate() {
         if (itemsIterator != null || GEWrapper.itemsStillActive(RSGrandExchangeOffer.Type.BUY))
             return true;
 
-        if (Quest.NATURE_SPIRIT.getVarpValue() <= 5 
+        if (Quest.NATURE_SPIRIT.getVarpValue() <= 65
                 && !GEWrapper.hasSupplies(NATURE_SPIRIT_SUPPLIES) && itemsIterator == null) {
 
             Log.fine("Buying Supplies");
@@ -80,7 +60,18 @@ public class BuySupplies extends Task {
     public int execute() {
 
         if (!GEWrapper.GE_AREA_LARGE.contains(Players.getLocal())) {
-            Movement.walkTo(BankLocation.GRAND_EXCHANGE.getPosition());
+            if (lastPosition == null)
+                lastPosition = Players.getLocal().getPosition();
+
+            Movement.walkTo(BankLocation.GRAND_EXCHANGE.getPosition(), WalkingWrapper::shouldBreakWalkLoop);
+            if (!Movement.isRunEnabled()) {
+                Movement.toggleRun(true);
+            }
+
+            SceneObject bridge = SceneObjects.getNearest("Bridge");
+            if (bridge != null && bridge.containsAction("Jump") && bridge.interact(a -> true)) {
+                Time.sleepUntil(() -> !Players.getLocal().isAnimating(), 5000);
+            }
             return Main.getLoopReturn();
         }
 
@@ -146,6 +137,9 @@ public class BuySupplies extends Task {
 
         if (!GEWrapper.itemsStillActive(RSGrandExchangeOffer.Type.BUY) && itemsIterator == null) {
             Log.fine("Done Restocking");
+            if (lastPosition.distance() > 3) {
+                Movement.walkTo(lastPosition);
+            }
         }
 
         return Random.low(800, 1500);
@@ -156,50 +150,6 @@ public class BuySupplies extends Task {
     }
 
     private int getQuantity(String item) {
-        if (item.equalsIgnoreCase("Lumbridge teleport"))
-            return 10;
-        if (item.equalsIgnoreCase("Staff of air"))
-            return 1;
-        if (item.equalsIgnoreCase("Staff of fire"))
-            return 1;
-        if (item.equalsIgnoreCase("Amulet of glory(6)"))
-            return 2;
-        if (item.equalsIgnoreCase("Ring of wealth (5)"))
-            return 2;
-        if (item.equalsIgnoreCase("Mind rune"))
-            return 1000;
-        if (item.equalsIgnoreCase("Air rune"))
-            return 1000;
-        if (item.equalsIgnoreCase("Water rune"))
-            return 200;
-        if (item.equalsIgnoreCase("Earth rune"))
-            return 200;
-        if (item.equalsIgnoreCase("Tuna"))
-            return 100;
-        if (item.equalsIgnoreCase("Stamina potion"))
-            return 10;
-        if (item.equalsIgnoreCase("Cheese"))
-            return 2;
-        if (item.equalsIgnoreCase("Leather gloves"))
-            return 1;
-        if (item.equalsIgnoreCase("Falador teleport"))
-            return 5;
-        if (item.equalsIgnoreCase("Games necklace (8)"))
-            return 1;
-        if (item.equalsIgnoreCase("Rope"))
-            return 2;
-        if (item.equalsIgnoreCase("Adamant scimitar"))
-            return 1;
-        if (item.equalsIgnoreCase("Ring of recoil"))
-            return 1;
-        if (item.equalsIgnoreCase("Bucket"))
-            return 1;
-        if (item.equalsIgnoreCase("Rune essence"))
-            return 50;
-        if (item.equalsIgnoreCase("Varrock teleport"))
-            return 5;
-        if (item.equalsIgnoreCase("Silver sickle"))
-            return 1;
 
         return 1;
     }

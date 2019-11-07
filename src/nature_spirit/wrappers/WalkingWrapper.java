@@ -4,6 +4,7 @@ import nature_spirit.data.Location;
 import org.rspeer.runetek.adapter.scene.Npc;
 import org.rspeer.runetek.adapter.scene.SceneObject;
 import org.rspeer.runetek.api.commons.Time;
+import org.rspeer.runetek.api.component.Dialog;
 import org.rspeer.runetek.api.movement.Movement;
 import org.rspeer.runetek.api.scene.Npcs;
 import org.rspeer.runetek.api.scene.Players;
@@ -30,9 +31,17 @@ public class WalkingWrapper {
             }
         } else {
             SceneObject bridge = SceneObjects.getNearest("Bridge");
-            if (bridge != null && bridge.interact(a -> true)) {
+            if (bridge != null && !Players.getLocal().isMoving() && bridge.interact(a -> true)) {
                 Time.sleepUntil(() -> Location.NATURE_GROTTO_AREA.contains(Players.getLocal()), 5000);
             }
+        }
+    }
+
+    public static void enterGrotto() {
+        SceneObject grotto = SceneObjects.getNearest("Grotto");
+
+        if (!Dialog.isOpen() && grotto != null && grotto.interact(a -> true)) {
+            Time.sleepUntil(() -> Dialog.isOpen() && !Players.getLocal().isMoving(), 5000);
         }
     }
 }

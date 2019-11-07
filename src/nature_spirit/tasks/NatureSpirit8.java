@@ -4,14 +4,16 @@ import nature_spirit.Main;
 import nature_spirit.data.Location;
 import nature_spirit.data.Quest;
 import nature_spirit.wrappers.WalkingWrapper;
+import org.rspeer.runetek.adapter.scene.Npc;
 import org.rspeer.runetek.adapter.scene.SceneObject;
 import org.rspeer.runetek.api.commons.Time;
 import org.rspeer.runetek.api.component.Dialog;
-import org.rspeer.runetek.api.component.tab.Inventory;
 import org.rspeer.runetek.api.movement.Movement;
+import org.rspeer.runetek.api.scene.Npcs;
 import org.rspeer.runetek.api.scene.Players;
 import org.rspeer.runetek.api.scene.SceneObjects;
 import org.rspeer.script.task.Task;
+import org.rspeer.ui.Log;
 
 public class NatureSpirit8 extends Task {
     @Override
@@ -21,46 +23,54 @@ public class NatureSpirit8 extends Task {
 
     @Override
     public int execute() {
-       if (!Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {
-           WalkingWrapper.walkToNatureGrotto();
-       }
+        if (Dialog.isOpen()) {
+            if (Dialog.canContinue()) {
+                Dialog.processContinue();
+            }
 
-       if (Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {
+            if (Dialog.isViewingChatOptions()) {
+                Dialog.process("I think I've solved the puzzle!");
+            }
+            return Main.getLoopReturn();
+        }
 
-           SceneObject brownStone =  SceneObjects.getNearest(3527);
+        if (!Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {
+            WalkingWrapper.walkToNatureGrotto();
+        }
 
-           if (brownStone != null && Inventory.use(i -> i.getName().equals("Mort myre fungus"), brownStone)) {
-               Time.sleepUntil(() -> !Players.getLocal().isMoving() && !Players.getLocal().isAnimating(), 5000);
-           }
+        SceneObject orangeStone = SceneObjects.getNearest(3528);
 
-           SceneObject greyStone =  SceneObjects.getNearest(3529);
+        if (Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {
 
-           if (greyStone != null && Inventory.use(i -> i.getName().equals("A used spell"), greyStone)) {
-               Time.sleepUntil(() -> !Players.getLocal().isMoving() && !Players.getLocal().isAnimating(), 5000);
-           }
+            if (Main.useItemOnObject("Mort myre fungus", 3527)) {
+                Log.info("Placed Fungus");
+            }
 
-           SceneObject orangeStone =  SceneObjects.getNearest(3528);
-           if (!Players.getLocal().getPosition().equals(orangeStone.getPosition())) {
-               Movement.walkTo(orangeStone::getPosition);
-           }
+            if (Main.useItemOnObject("A used spell", 3529)) {
+                Log.info("Placed Spell");
+            }
 
-           SceneObject grotto = SceneObjects.getNearest("Grotto");
+            if (!Players.getLocal().getPosition().equals(orangeStone.getPosition())) {
+                Movement.walkTo(orangeStone);
+                Time.sleepUntil(() -> Players.getLocal().getPosition().equals(orangeStone.getPosition()), 5000);
+            }
 
-           if (!Dialog.isOpen() && grotto != null && grotto.interact(a -> true)) {
-               Time.sleepUntil(Dialog::isOpen, 5000);
-           }
+            if (Players.getLocal().getPosition().equals(orangeStone.getPosition())) {
 
-           if (Dialog.isOpen()) {
-               if (Dialog.canContinue()) {
-                   Dialog.processContinue();
-               }
+                Npc filliman = Npcs.getNearest("Filliman Tarlock");
+                SceneObject grotto = SceneObjects.getNearest("Grotto");
 
-               if (Dialog.isViewingChatOptions()) {
-                   //Dialog.process("Could I have another bloom scroll please?");
-               }
-           }
-       }
+                if (filliman == null) {
+                    if (!Dialog.isOpen() && grotto != null && grotto.interact(a -> true)) {
+                        Time.sleepUntil(Dialog::isOpen, 5000);
+                    }
+                } else {
+                    filliman.interact("Talk-to");
+                    Time.sleepUntil(Dialog::isOpen, 5000);
+                }
+            }
+        }
 
-       return Main.getLoopReturn();
+        return Main.getLoopReturn();
     }
 }

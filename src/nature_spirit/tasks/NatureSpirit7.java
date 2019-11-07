@@ -58,38 +58,39 @@ public class NatureSpirit7 extends Task {
             if (Location.NATURE_GROTTO_AREA.contains(Players.getLocal())) {
                 SceneObject bridge = SceneObjects.getNearest("Bridge");
 
-                if (bridge != null && bridge.interact(a -> true)) {
+                if (bridge != null && !Players.getLocal().isMoving() && bridge.interact(a -> true)) {
                     Time.sleepUntil(() -> !Location.NATURE_GROTTO_AREA.contains(Players.getLocal()), 5000);
                 }
             }
 
-            if (Location.ROTTING_LOG_POSITION.distance() > 2) {
+            if (Location.ROTTING_LOG_POSITION.distance() > 1) {
                 Movement.walkTo(Location.ROTTING_LOG_POSITION, WalkingWrapper::shouldBreakWalkLoop);
             }
 
             SceneObject log = SceneObjects.getNearest("Rotting log");
             Item spell = Inventory.getFirst("Druidic spell");
 
-            if (log != null && log.distance() < 2 && spell != null && spell.interact(ActionOpcodes.ITEM_ACTION_0)) {
-                Time.sleepUntil(() -> SceneObjects.getNearest(3509) != null, 6000);
+            if (SceneObjects.getNearest(3509) == null && log != null && log.getPosition().equals(Players.getLocal().getPosition())) {
+                Movement.walkTo(Location.ROTTING_LOG_POSITION.translate(Random.nextInt(-1, 1), Random.nextInt(-1, 1)));
+            }
 
-                SceneObject fungiLog = SceneObjects.getNearest(3509);
+            if (log != null && log.distance() <= 1 && spell != null && spell.interact(ActionOpcodes.ITEM_ACTION_0)) {
 
-                if (fungiLog != null && (fungiLog.click()
-                        || fungiLog.interact(a -> true)
-                        || fungiLog.interact("Pick")
-                        || fungiLog.interact(ActionOpcodes.OBJECT_ACTION_0)
-                        || fungiLog.interact(ActionOpcodes.GROUND_ITEM_ACTION_0)
-                        || fungiLog.interact(ActionOpcodes.INTERFACE_ACTION)
-                        || fungiLog.interact(ActionOpcodes.ITEM_ACTION_0))) {
+                Time.sleepUntil(() -> SceneObjects.getNearest(3509) != null && !Players.getLocal().isAnimating(), 6000);
+                Time.sleep(600, 800);
+
+            }
+
+            SceneObject fungiLog = SceneObjects.getNearest(3509);
+
+            while (fungiLog != null && !Inventory.contains("Mort myre fungus")) {
+                if (fungiLog.click()) {
                     Time.sleepUntil(() -> Inventory.contains("Mort myre fungus"), 5000);
                 } else {
-                    Log.severe("Cant pick fungi");
-
-                    if (log.getPosition().equals(Players.getLocal().getPosition())) {
-                        Movement.walkTo(Location.ROTTING_LOG_POSITION.translate(Random.nextInt(-1, 1), Random.nextInt(-1, 1)));
-                    }
+                    Log.severe("Cant Pick Fungi");
                 }
+                fungiLog = SceneObjects.getNearest(3509);
+                Time.sleep(300, 600);
             }
         }
 
